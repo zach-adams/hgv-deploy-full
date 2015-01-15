@@ -17,13 +17,6 @@
   file: src=/etc/nginx/sites-available/{{ enviro }}.conf dest=/etc/nginx/sites-enabled/{{ enviro }}.conf state=link
   notify: nginx reload
 
-- name: "Set up cache alias for {{ enviro }}"
-  template: src=etc/nginx/wpcache.conf dest=/etc/nginx/sites-available/cache.{{ enviro }}.conf
-
-- name: "Enable cache alias for {{ enviro }}"
-  file: src=/etc/nginx/sites-available/cache.{{ enviro }}.conf dest=/etc/nginx/sites-enabled/cache.{{ enviro }}.conf state=link
-  notify: nginx reload
-
 - name: "Download and install WordPress for {{ enviro }}"
   command: /usr/local/bin/wp core download --path={{ wp_doc_root}}
   sudo: yes
