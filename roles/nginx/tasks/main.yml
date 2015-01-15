@@ -1,0 +1,38 @@
+---
+- name: Install Nginx GPG key
+  apt_key: url=http://nginx.org/keys/nginx_signing.key state=present
+
+- name: Enable Nginx stable repo
+  apt_repository: repo='deb http://nginx.org/packages/ubuntu {{ ansible_lsb.codename }} nginx' state=present update_cache=yes
+
+- name: Install nginx
+  apt: name=nginx state=present
+  notify:
+    - nginx restart
+    - update-rc nginx
+
+- name: Ensure /etc/nginx directories exist
+  file: path={{ item }} state=directory owner=root group=root mode=0755
+  with_items:
+    - /etc/nginx/sites-available
+    - /etc/nginx/sites-enabled
+
+- name: Configure /etc/nginx/nginx.conf
+  template: src=etc/nginx/nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root mode=0644
+  notify: nginx restart
+
+- name: Do nginx upstream.conf
+  template: src=etc/nginx/conf.d/upstream.conf dest=/etc/nginx/conf.d/upstream.conf owner=root group=root mode=0644
+  notify: nginx restart
+
+- name: Remove default.conf
+  file: path=/etc/nginx/sites-enabled/default state=absent
+
+- name: Ensure main docroot exists
+  file: path={{ wp_doc_root }} state=directory
+
+- name: Set up master docroot
+  file: path={{ wp_doc_root }} state=directory owner={{ web_user }} group={{ web_group }} mode=0775
+
+- name: Make sure Nginx is running
+  service: name=nginx state=started enabled=yes

@@ -1,0 +1,10 @@
+---
+
+- name: hhvm reload
+  service: name=hhvm state=reloaded
+
+- name: hhvm restart
+  service: name=hhvm state=restarted
+
+- name: update-rc hhvm
+  command: update-rc.d hhvm defaults

@@ -1,0 +1,26 @@
+---
+host: "testing.zach-adams.com"
+
+wp_db_name: wordpress
+wp_db_user: wpuser
+wp_db_password: secret
+
+wp_admin_user: admin
+wp_admin_password: password
+
+wp_site_name: Mercury WP Site
+
+nginx_listen_port: 80
+varnish_listen_port: 6081
+nginx_listen_port_http_to_fcgi: 8083
+
+varnish_version: 3.0
+phpmyadmin_version: 4.3.6-english
+phpmemcachedadmin_version: 1.2.2-r262
+wpcli_version: WP-CLI 0.17.1
+wp_doc_root: /nas/wp/www/sites
+vagrant_doc_root: /hgv_data/sites
+web_user: www-data
+web_group: www-data
+
+xhprof_root: /opt/xhprof

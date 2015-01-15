@@ -1,0 +1,34 @@
+---
+- name: Install necessary packages for proper system state
+  apt: name={{ item }} state=latest
+  with_items:
+    - sysv-rc-conf
+    - python-apt
+    - python-pycurl
+    - python-mysqldb
+    - git
+    - curl
+    - unzip
+    - php5-mysql
+    - traceroute
+    - ack-grep
+    - subversion
+    - autojump
+    - siege
+
+- name: Get Composer
+  get_url: url=https://getcomposer.org/composer.phar dest=/usr/local/bin/composer mode=0755 validate_certs=no
+
+- name: Install PsySH
+  get_url: url=http://psysh.org/psysh dest=/usr/local/bin/psysh mode=0755
+
+- name: Install Boris
+  get_url: url=https://github.com/d11wtq/boris/releases/download/v1.0.8/boris.phar dest=/usr/local/bin/boris mode=0755 validate_certs=no
+
+- name: Fix the stdin bug, step 1
+  lineinfile: dest=/root/.profile line="mesg n" state=absent
+
+- name: Fix the stdin bug, step 2
+  lineinfile: dest=/root/.profile line="tty -s && mesg n"
+
+- include: swap.yml

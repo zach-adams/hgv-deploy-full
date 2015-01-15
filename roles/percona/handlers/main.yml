@@ -1,0 +1,11 @@
+---
+
+- name: mysql restart
+  service: name=mysql state=restarted
+
+- name: mysql reload
+  service: name=mysql state=reloaded
+
+- name: update-rc mysql
+  command: update-rc.d mysql defaults
+

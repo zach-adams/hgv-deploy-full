@@ -1,0 +1,8 @@
+---
+
+- name: Install memcached server
+  apt: name=memcached state=present
+
+- name: Do memcached config
+  template: src=etc/memcached.conf dest=/etc/memcached.conf owner=root group=root mode=0644
+  notify: memcached restart

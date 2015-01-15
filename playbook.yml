@@ -1,0 +1,15 @@
+---
+- hosts: all
+  connection: local
+  sudo: yes
+
+  roles:
+    - common
+    - hhvm
+    - php-fpm
+    - memcached
+    - percona
+    - nginx
+    - wp-cli
+    - varnish
+    - { role: wordpress, enviro: hhvm, tags: [ 'wordpress' ] }
