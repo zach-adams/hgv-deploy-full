@@ -10,9 +10,8 @@ wp_admin_password: password
 
 wp_site_name: Mercury WP Site
 
-nginx_listen_port: 80
-varnish_listen_port: 6081
-nginx_listen_port_http_to_fcgi: 8083
+nginx_listen_port: 8080
+varnish_listen_port: 80
 
 varnish_version: 3.0
 phpmyadmin_version: 4.3.6-english

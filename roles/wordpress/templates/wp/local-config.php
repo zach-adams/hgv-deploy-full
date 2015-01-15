@@ -26,10 +26,4 @@ $memcached_servers = array(
     )
 );
 
-if( isset($_SERVER['HTTP_HOST']) && 'cache.' === substr( $_SERVER['HTTP_HOST'], 0, 6) ){
-    define('WP_SITEURL', 'http://cache.{{ host }}');
-    define('WP_HOME', 'http://cache.{{ host }}');
-    define('WP_CACHE_KEY_SALT', 'cache_{{ wp_db_name }}_1');
-}else{
-    define('WP_CACHE_KEY_SALT', '{{ wp_db_name }}_1');
-}
+define('WP_CACHE_KEY_SALT', '{{ wp_db_name }}_1');

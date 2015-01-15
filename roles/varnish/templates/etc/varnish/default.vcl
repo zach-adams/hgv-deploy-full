@@ -4,143 +4,107 @@
 #}
 
 
-backend local_webserver {
+backend default {
 	.host = "127.0.0.1";
-	.port = "{{ nginx_listen_port_http_to_fcgi }}";
+    .port = "8080";
+	.connect_timeout = 600s;
+	.first_byte_timeout = 600s;
+	.between_bytes_timeout = 600s;
+	.max_connections = 800;
+}
+
+
+acl purge {
+	"localhost";
 }
 
 sub vcl_recv {
-	# set the backend to the local server
-	set req.backend = local_webserver;
+	set req.grace = 2m;
 
-	# Save the original User Agent; Apache will use this if it makes it there, even if we want to simplify it for caching here.
-	set req.http.X-UA-Original = req.http.User-Agent;
+  # Set X-Forwarded-For header for logging in nginx
+  remove req.http.X-Forwarded-For;
+  set    req.http.X-Forwarded-For = client.ip;
 
-	# Grace period we can use to serve old stuff on 500 errors or other problems.
-	set req.grace = 12h;
 
-	# Use HTTP/1.1 on the backend even if the requesting client didn't want it.
-	set req.proto = "HTTP/1.1";
+  # Remove has_js and CloudFlare/Google Analytics __* cookies.
+  set req.http.Cookie = regsuball(req.http.Cookie, "(^|;\s*)(_[_a-z]+|has_js)=[^;]*", "");
+  # Remove a ";" prefix, if present.
+  set req.http.Cookie = regsub(req.http.Cookie, "^;\s*", "");
 
-	# Ensure the "Host" header is passed on for virtual hosting, without port.
-	if ( req.http.host ) {
-		set req.http.host = regsub(req.http.host, ":\d+$", "");
-	} else {
-		error 404 "Host header required";
-	}
+
+
+# Either the admin pages or the login
+if (req.url ~ "/wp-(login|admin|cron)") {
+        # Don't cache, pass to backend
+        return (pass);
 }
 
-#
-# Below is a commented-out copy of the default VCL logic.  If you
-# redefine any of these subroutines, the built-in logic will be
-# appended to your code.
-# sub vcl_recv {
-#     if (req.restarts == 0) {
-# 	if (req.http.x-forwarded-for) {
-# 	    set req.http.X-Forwarded-For =
-# 		req.http.X-Forwarded-For + ", " + client.ip;
-# 	} else {
-# 	    set req.http.X-Forwarded-For = client.ip;
-# 	}
-#     }
-#     if (req.request != "GET" &&
-#       req.request != "HEAD" &&
-#       req.request != "PUT" &&
-#       req.request != "POST" &&
-#       req.request != "TRACE" &&
-#       req.request != "OPTIONS" &&
-#       req.request != "DELETE") {
-#         /* Non-RFC2616 or CONNECT which is weird. */
-#         return (pipe);
-#     }
-#     if (req.request != "GET" && req.request != "HEAD") {
-#         /* We only deal with GET and HEAD by default */
-#         return (pass);
-#     }
-#     if (req.http.Authorization || req.http.Cookie) {
-#         /* Not cacheable by default */
-#         return (pass);
-#     }
-#     return (lookup);
-# }
-#
-# sub vcl_pipe {
-#     # Note that only the first request to the backend will have
-#     # X-Forwarded-For set.  If you use X-Forwarded-For and want to
-#     # have it set for all requests, make sure to have:
-#     # set bereq.http.connection = "close";
-#     # here.  It is not set by default as it might break some broken web
-#     # applications, like IIS with NTLM authentication.
-#     return (pipe);
-# }
-#
-# sub vcl_pass {
-#     return (pass);
-# }
-#
-# sub vcl_hash {
-#     hash_data(req.url);
-#     if (req.http.host) {
-#         hash_data(req.http.host);
-#     } else {
-#         hash_data(server.ip);
-#     }
-#     return (hash);
-# }
-#
-# sub vcl_hit {
-#     return (deliver);
-# }
-#
-# sub vcl_miss {
-#     return (fetch);
-# }
-#
-# sub vcl_fetch {
-#     if (beresp.ttl <= 0s ||
-#         beresp.http.Set-Cookie ||
-#         beresp.http.Vary == "*") {
-# 		/*
-# 		 * Mark as "Hit-For-Pass" for the next 2 minutes
-# 		 */
-# 		set beresp.ttl = 120 s;
-# 		return (hit_for_pass);
-#     }
-#     return (deliver);
-# }
-#
-# sub vcl_deliver {
-#     return (deliver);
-# }
-#
-# sub vcl_error {
-#     set obj.http.Content-Type = "text/html; charset=utf-8";
-#     set obj.http.Retry-After = "5";
-#     synthetic {"
-# <?xml version="1.0" encoding="utf-8"?>
-# <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-#  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-# <html>
-#   <head>
-#     <title>"} + obj.status + " " + obj.response + {"</title>
-#   </head>
-#   <body>
-#     <h1>Error "} + obj.status + " " + obj.response + {"</h1>
-#     <p>"} + obj.response + {"</p>
-#     <h3>Guru Meditation:</h3>
-#     <p>XID: "} + req.xid + {"</p>
-#     <hr>
-#     <p>Varnish cache server</p>
-#   </body>
-# </html>
-# "};
-#     return (deliver);
-# }
-#
-# sub vcl_init {
-# 	return (ok);
-# }
-#
-# sub vcl_fini {
-# 	return (ok);
-# }
+
+# Remove the wp-settings-1 cookie
+set req.http.Cookie = regsuball(req.http.Cookie, "wp-settings-1=[^;]+(; )?", "");
+
+# Remove the wp-settings-time-1 cookie
+set req.http.Cookie = regsuball(req.http.Cookie, "wp-settings-time-1=[^;]+(; )?", "");
+
+# Remove the wp test cookie
+set req.http.Cookie = regsuball(req.http.Cookie, "wordpress_test_cookie=[^;]+(; )?", "");
+
+# Static content unique to the theme can be cached (so no user uploaded images)
+# The reason I don't take the wp-content/uploads is because of cache size on bigger blogs
+# that would fill up with all those files getting pushed into cache
+if (req.url ~ "wp-content/themes/" && req.url ~ "\.(css|js|png|gif|jp(e)?g)") {
+    unset req.http.cookie;
+}
+
+# Even if no cookies are present, I don't want my "uploads" to be cached due to their potential size
+if (req.url ~ "/wp-content/uploads/") {
+    return (pass);
+}
+
+# Check the cookies for wordpress-specific items
+if (req.http.Cookie ~ "wordpress_" || req.http.Cookie ~ "comment_") {
+        # A wordpress specific cookie has been set
+    return (pass);
+}
+
+
+
+	# allow PURGE from localhost
+	if (req.request == "PURGE") {
+		if (!client.ip ~ purge) {
+			error 405 "Not allowed.";
+		}
+		return (lookup);
+	}
+
+
+	# Force lookup if the request is a no-cache request from the client
+	if (req.http.Cache-Control ~ "no-cache") {
+		return (pass);
+	}
+
+
+# Try a cache-lookup
+return (lookup);
+
+}
+
+sub vcl_fetch {
+	#set obj.grace = 5m;
+    set beresp.grace = 2m;
+
+}
+
+sub vcl_hit {
+        if (req.request == "PURGE") {
+                purge;
+                error 200 "Purged.";
+        }
+}
+
+sub vcl_miss {
+        if (req.request == "PURGE") {
+                purge;
+                error 200 "Purged.";
+        }
+}
