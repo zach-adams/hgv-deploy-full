@@ -10,16 +10,11 @@ wp_admin_password: password
 
 wp_site_name: Mercury WP Site
 
-nginx_listen_port: 8080
-varnish_listen_port: 80
+wp_doc_root: /var/www/html
 
 varnish_version: 3.0
 phpmyadmin_version: 4.3.6-english
 phpmemcachedadmin_version: 1.2.2-r262
 wpcli_version: WP-CLI 0.17.1
-wp_doc_root: /nas/wp/www/sites
-vagrant_doc_root: /hgv_data/sites
 web_user: www-data
 web_group: www-data
-
-xhprof_root: /opt/xhprof

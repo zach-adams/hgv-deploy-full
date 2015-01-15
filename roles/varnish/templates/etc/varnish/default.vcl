@@ -1,110 +1,94 @@
-# IP addresses allowed to do "purge" operations. Reject from the Internet in general!
-#acl purge {
-#	"127.0.0.1";
-#}
-
-
 backend default {
-	.host = "127.0.0.1";
+    .host = "127.0.0.1";
     .port = "8080";
-	.connect_timeout = 600s;
-	.first_byte_timeout = 600s;
-	.between_bytes_timeout = 600s;
-	.max_connections = 800;
 }
 
-
 acl purge {
-	"localhost";
+	"127.0.0.1";
 }
 
 sub vcl_recv {
-	set req.grace = 2m;
-
-  # Set X-Forwarded-For header for logging in nginx
-  remove req.http.X-Forwarded-For;
-  set    req.http.X-Forwarded-For = client.ip;
-
-
-  # Remove has_js and CloudFlare/Google Analytics __* cookies.
-  set req.http.Cookie = regsuball(req.http.Cookie, "(^|;\s*)(_[_a-z]+|has_js)=[^;]*", "");
-  # Remove a ";" prefix, if present.
-  set req.http.Cookie = regsub(req.http.Cookie, "^;\s*", "");
-
-
-
-# Either the admin pages or the login
-if (req.url ~ "/wp-(login|admin|cron)") {
-        # Don't cache, pass to backend
-        return (pass);
-}
-
-
-# Remove the wp-settings-1 cookie
-set req.http.Cookie = regsuball(req.http.Cookie, "wp-settings-1=[^;]+(; )?", "");
-
-# Remove the wp-settings-time-1 cookie
-set req.http.Cookie = regsuball(req.http.Cookie, "wp-settings-time-1=[^;]+(; )?", "");
-
-# Remove the wp test cookie
-set req.http.Cookie = regsuball(req.http.Cookie, "wordpress_test_cookie=[^;]+(; )?", "");
-
-# Static content unique to the theme can be cached (so no user uploaded images)
-# The reason I don't take the wp-content/uploads is because of cache size on bigger blogs
-# that would fill up with all those files getting pushed into cache
-if (req.url ~ "wp-content/themes/" && req.url ~ "\.(css|js|png|gif|jp(e)?g)") {
-    unset req.http.cookie;
-}
-
-# Even if no cookies are present, I don't want my "uploads" to be cached due to their potential size
-if (req.url ~ "/wp-content/uploads/") {
-    return (pass);
-}
-
-# Check the cookies for wordpress-specific items
-if (req.http.Cookie ~ "wordpress_" || req.http.Cookie ~ "comment_") {
-        # A wordpress specific cookie has been set
-    return (pass);
-}
-
-
-
-	# allow PURGE from localhost
+	# Allow purge requests
 	if (req.request == "PURGE") {
-		if (!client.ip ~ purge) {
-			error 405 "Not allowed.";
-		}
-		return (lookup);
+        if (!client.ip ~ purge) {
+            error 405 "Not allowed.";
+        }
+        ban("req.url ~ ^" + req.url + " && req.http.host == " + req.http.host);
+        return(lookup);
+    }
+
+	# Add header for sending client ip to backend
+	set	req.http.X-Forwarded-For = client.ip;
+
+	# Normalize	content-encoding
+	if (req.http.Accept-Encoding) {
+        if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|lzma|tbz)(\?.*|)$") {
+            remove req.http.Accept-Encoding;
+        } elsif (req.http.Accept-Encoding ~ "gzip") {
+            set req.http.Accept-Encoding = "gzip";
+        } elsif (req.http.Accept-Encoding ~ "deflate") {
+            set	req.http.Accept-Encoding = "deflate";
+        } else {
+            remove req.http.Accept-Encoding;
+        }
+    }
+
+    # Remove cookies and query string for real static files
+    if (req.url ~ "^/[^?]+\.(gif|jpg|jpeg|swf|css|js|txt|flv|mp3|mp4|pdf|ico|png|gz|zip|lzma|bz2|tgz|tbz)(\?.*|)$") {
+       unset req.http.cookie;
+       set req.url = regsub(req.url, "\?.*$", "");
+    }
+
+    # Don't cache admin
+    if (req.url ~ "((wp-(login|admin|comments-post.php|cron.php))|login|timthumb|wrdp_files)" || req.url ~ "preview=true" || req.url ~ "xmlrpc.php") {
+        return (pass);
+    } else {
+    	if ( !(req.http.cookie ~ "wpoven-no-cache") ) {
+    	    unset req.http.cookie;
+    	}
 	}
-
-
-	# Force lookup if the request is a no-cache request from the client
-	if (req.http.Cache-Control ~ "no-cache") {
-		return (pass);
-	}
-
-
-# Try a cache-lookup
-return (lookup);
-
-}
-
-sub vcl_fetch {
-	#set obj.grace = 5m;
-    set beresp.grace = 2m;
-
 }
 
 sub vcl_hit {
-        if (req.request == "PURGE") {
-                purge;
-                error 200 "Purged.";
-        }
+	# purge cached objects from memory
+	if (req.request == "PURGE") {
+		purge;
+		error 200 "Purged";
+	}
 }
 
 sub vcl_miss {
+	# purge cached objects variants from memory
         if (req.request == "PURGE") {
-                purge;
-                error 200 "Purged.";
+	    if (!client.ip ~ purge) {
+		error 405 "Not allowed.";
+	    }
+	    ban("req.url ~ "+req.url);
+	    error 200 "Purged";
         }
+
+	if (req.request == "PURGE") {
+		purge;
+		error 404 "Purged varients";
+	}
+}
+
+sub vcl_fetch {
+	# Dont cache admin
+	if (req.url ~ "(wp-(login|admin|comments-post.php|cron.php))|login" || req.url ~ "preview=true" || req.url ~ "xmlrpc.php") {
+    	return (deliver);
+	} else {
+    	if ( beresp.ttl > 0s && !(beresp.http.set-cookie ~ "wpoven-no-cache") ) {
+    	    unset beresp.http.set-cookie;
+        }
+    }
+}
+
+sub vcl_deliver {
+    # Remove unwanted headers
+    unset resp.http.Server;
+    unset resp.http.X-Powered-By;
+    unset resp.http.x-backend;
+    unset resp.http.Via;
+    unset resp.http.X-Varnish;
 }

@@ -21,10 +21,6 @@
   template: src=etc/nginx/nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root mode=0644
   notify: nginx restart
 
-- name: Do nginx upstream.conf
-  template: src=etc/nginx/conf.d/upstream.conf dest=/etc/nginx/conf.d/upstream.conf owner=root group=root mode=0644
-  notify: nginx restart
-
 - name: Remove default.conf
   file: path=/etc/nginx/sites-enabled/default state=absent
 

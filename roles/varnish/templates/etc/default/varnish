@@ -2,13 +2,16 @@ START=yes
 NFILES=131072
 MEMLOCK=82000
 INSTANCE=$(uname -n)
-VARNISH_VCL_CONF=/etc/varnish/default.vcl
-VARNISH_LISTEN_ADDRESS=
-VARNISH_LISTEN_PORT={{ varnish_listen_port }}
-VARNISH_ADMIN_LISTEN_ADDRESS=127.0.0.1
-VARNISH_ADMIN_LISTEN_PORT=6082
-DAEMON_OPTS="-a *:${VARNISH_LISTEN_PORT} \
-             -T ${VARNISH_ADMIN_LISTEN_ADDRESS}:${VARNISH_ADMIN_LISTEN_PORT} \
-             -f ${VARNISH_VCL_CONF} \
-             -S /etc/varnish/secret \
-             -s malloc,256m"
+DAEMON_OPTS="-a :80 \
+    -T localhost:6082 \
+    -f /etc/varnish/default.vcl \
+    -u www-data -g www-data \
+    -S /etc/varnish/secret \
+    -p thread_pools=2 \
+    -p thread_pool_min=25 \
+    -p thread_pool_max=250 \
+    -p thread_pool_add_delay=2 \
+    -p session_linger=50 \
+    -p sess_workspace=262144 \
+    -p cli_timeout=40 \
+    -s malloc,256m"
