@@ -1,17 +1,17 @@
-- name: "Provision {{ wp_db_name }} WP Database"
+- name: "Provision WP Database"
   mysql_db: name="{{ wp_db_name }}" state=present
 
-- name: "Grant {{ wp_db_user }} WP user access to WP DB {{ wp_db_name }}"
+- name: "Grant WP user access to WP DB"
   mysql_user: name="{{ wp_db_user }}" priv="{{ wp_db_name }}.*:ALL" host="%" password={{ wp_db_password }} state=present
 
-- name: "Grant {{ wp_db_user }} WP user access to WP DB  {{ wp_db_name }}"
+- name: "Grant WP user access to WP DB"
   mysql_user: name="{{ wp_db_user }}" priv="{{ wp_db_name }}.*:ALL" host="localhost" password={{ wp_db_password }} state=present
 
-- name: "Set up {{ wp_doc_root }} docroot"
+- name: "Set up docroot"
   file: path={{ wp_doc_root }} state=directory owner={{ web_user }} group={{ web_group }}
 
-- name: "Set up {{ enviro }} virtualhost"
-  template: src=etc/nginx/wordpress.conf dest=/etc/nginx/sites-available/{{ enviro }}.conf
+- name: "Set up virtualhost"
+  template: src=etc/nginx/hhvm.conf dest=/etc/nginx/sites-available/{{ enviro }}.conf
 
 - name: "Enable {{ enviro }} virtualhost"
   file: src=/etc/nginx/sites-available/{{ enviro }}.conf dest=/etc/nginx/sites-enabled/{{ enviro }}.conf state=link
