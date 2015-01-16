@@ -43,3 +43,10 @@
   args:
     #   run_once: true
       chdir: "{{ wp_doc_root }}"
+
+- name: Restart Varnish
+  apt: name=varnish state=present
+  notify: varnish restart
+- name: Restart Nginx
+  apt: name=nginx state=present
+  notify: nginx restart

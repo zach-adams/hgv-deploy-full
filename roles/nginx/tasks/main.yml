@@ -28,6 +28,12 @@
 - name: Remove default.conf
   file: path=/etc/nginx/sites-enabled/default state=absent
 
+- name: Remove default conf.d
+  file: path=/etc/nginx/conf.d/default.conf state=absent
+
+- name: Remove example ssl conf.d
+  file: path=/etc/nginx/conf.d/example_ssl.conf state=absent
+
 - name: Ensure main docroot exists
   file: path={{ wp_doc_root }} state=directory
 
