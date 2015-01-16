@@ -1,9 +1,0 @@
-server {
-        listen   {{ nginx_listen_port }} default;
-        server_name  _ hgv.dev;
-        root {{ wp_doc_root }}/dashboard;
-
-        location / {
-                try_files $uri $uri/ /index.html;
-        }
-}

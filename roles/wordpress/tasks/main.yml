@@ -11,10 +11,10 @@
   file: path={{ wp_doc_root }} state=directory owner={{ web_user }} group={{ web_group }}
 
 - name: "Set up virtualhost"
-  template: src=etc/nginx/hhvm.conf dest=/etc/nginx/sites-available/{{ enviro }}.conf
+  template: src=etc/nginx/hhvm.conf dest=/etc/nginx/sites-available/{{ host }}
 
 - name: "Enable {{ enviro }} virtualhost"
-  file: src=/etc/nginx/sites-available/{{ enviro }}.conf dest=/etc/nginx/sites-enabled/{{ enviro }}.conf state=link
+  file: src=/etc/nginx/sites-available/{{ host }} dest=/etc/nginx/sites-enabled/{{ host }} state=link
   notify: nginx reload
 
 - name: "Download and install WordPress for {{ enviro }}"
