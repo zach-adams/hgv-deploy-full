@@ -23,7 +23,7 @@ This Playbook will setup:
 
 1. SSH onto a newly created server
 2. Add Ansible with `sudo add-apt-repository ppa:rquillo/ansible`
-3. Update Apt with `sudo apt-get update && sudo apt-get ugprade`
+3. Update Apt with `sudo apt-get update && sudo apt-get upgrade`
 4. Install Git and Ansible with `sudo apt-get install ansible git`
 5. Clone this repository with `git clone https://github.com/zach-adams/hgv-deploy-full/`
 6. **IMPORTANT**: Change your settings inside `all` with `vim|nano|emacs group_vars/all`
