@@ -19,6 +19,8 @@ This Playbook will setup:
 - **Clean WordPress Install** (Latest Version)
 - **WP-CLI**
 
+#### This playbook will only run on Ubuntu 14.04 LTS or later
+
 ## Installation
 
 1. SSH onto a newly created server
@@ -26,12 +28,12 @@ This Playbook will setup:
 3. Update Apt with `sudo apt-get update && sudo apt-get upgrade`
 4. Install Git and Ansible with `sudo apt-get install ansible git`
 5. Clone this repository with `git clone https://github.com/zach-adams/hgv-deploy-full/`
-6. **IMPORTANT**: Change your settings inside `all` and `hosts` with `vim|nano|emacs group_vars/all` and `vim|nano|emacs hosts`
-7. Run Ansible with `ansible-playbook -i hosts playbook.yml`
-8. Remove the cloned git directory from your server
-9. You're good to go! A new WordPress install running HHVM and Varnish should be waiting for you at your hostname!
+6. Edit `group_vars/all` with your specific details with `vim|emacs|nano group_vars/all`
+7. Edit `hosts` with your specific hostname `vim|emacs|nano hosts`
+8. Run Ansible with `ansible-playbook -i hosts playbook.yml`
+9. Remove the cloned git directory from your server
+10. You're good to go! A new WordPress install running HHVM and Varnish should be waiting for you at your hostname!
 
-## Details
+## Issues
 
-- You can find specific details of the site install in `group_vars/all`
-- This setup currently works on Ubuntu 14.04 LTS and I cannot guarantee it will run on anything else (testing other distros soon!)
+Please report any issues through Github or email me at zach@zach-adams.com and I'll do my best to get back to you!
