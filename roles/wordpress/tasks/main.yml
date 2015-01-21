@@ -8,7 +8,7 @@
   mysql_user: name="{{ wp_db_user }}" priv="{{ wp_db_name }}.*:ALL" host="localhost" password={{ wp_db_password }} state=present
 
 - name: "Set up docroot"
-  file: path={{ wp_doc_root }} state=directory owner={{ web_user }} group={{ web_group }}
+  file: path={{ wp_doc_root }}/{{ host }} state=directory owner={{ web_user }} group={{ web_group }}
 
 - name: "Set up virtualhost"
   template: src=etc/nginx/hhvm.conf dest=/etc/nginx/sites-available/{{ host }}
@@ -18,7 +18,7 @@
   notify: nginx reload
 
 - name: "Download and install WordPress for {{ enviro }}"
-  command: /usr/local/bin/wp core download --path={{ wp_doc_root}}
+  command: /usr/local/bin/wp core download --path={{ wp_doc_root}}/{{ host }}
   sudo: yes
   sudo_user: "{{ web_user }}"
 
@@ -28,13 +28,13 @@
   sudo: no
 
 - name: "Create wp-config for {{ enviro }}"
-  template: src=wp/wp-config.php dest={{ wp_doc_root }}/wp-config.php owner={{ web_user }} group={{ web_group }}
+  template: src=wp/wp-config.php dest={{ wp_doc_root }}/{{ host }}/wp-config.php owner={{ web_user }} group={{ web_group }}
 
 - name: "Localconfig for {{ enviro }} WordPress"
-  template: src=wp/local-config.php dest={{ wp_doc_root }}/local-config.php owner={{ web_user }} group={{ web_group }}
+  template: src=wp/local-config.php dest={{ wp_doc_root }}/{{ host }}/local-config.php owner={{ web_user }} group={{ web_group }}
 
 - name: "Object Cache for {{ enviro }} WordPress"
-  template: src=wp/object-cache.php dest={{ wp_doc_root }}/wp-content/object-cache.php owner={{ web_user }} group={{ web_group }}
+  template: src=wp/object-cache.php dest={{ wp_doc_root }}/{{ host }}/wp-content/object-cache.php owner={{ web_user }} group={{ web_group }}
 
 - name: "Run the WP install for {{ enviro }}"
   command: /usr/local/bin/wp core install --url={{ host }} --title="{{ wp_site_name }}" --admin_user={{ wp_admin_user }} --admin_password={{ wp_admin_password }} --admin_email="admin@example.com"
@@ -42,7 +42,7 @@
   sudo_user: "{{ web_user }}"
   args:
     #   run_once: true
-      chdir: "{{ wp_doc_root }}"
+      chdir: "{{ wp_doc_root }}/{{ host }}"
 
 
 - service: name=varnish state=restarted
