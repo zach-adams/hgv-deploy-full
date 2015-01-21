@@ -35,10 +35,10 @@
   file: path=/etc/nginx/conf.d/example_ssl.conf state=absent
 
 - name: Ensure main docroot exists
-  file: path={{ wp_doc_root }} state=directory
+  file: path={{ wp_doc_root }}/{{ host }} state=directory
 
 - name: Set up master docroot
-  file: path={{ wp_doc_root }} state=directory owner={{ web_user }} group={{ web_group }} mode=0775
+  file: path={{ wp_doc_root }}/{{ host }} state=directory owner={{ web_user }} group={{ web_group }} mode=0775
 
 - name: Make sure Nginx is running
   service: name=nginx state=started enabled=yes
