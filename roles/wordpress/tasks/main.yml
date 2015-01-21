@@ -1,24 +1,24 @@
 - name: "Provision WP Database"
-  mysql_db: name="{{ wp_db_name }}" state=present
+  mysql_db: name="{{ db }}" state=present
 
 - name: "Grant WP user access to WP DB"
-  mysql_user: name="{{ wp_db_user }}" priv="{{ wp_db_name }}.*:ALL" host="%" password={{ wp_db_password }} state=present
+  mysql_user: name="{{ db_user }}" priv="{{ db }}.*:ALL" host="%" password={{ db_user_password }} state=present
 
 - name: "Grant WP user access to WP DB"
-  mysql_user: name="{{ wp_db_user }}" priv="{{ wp_db_name }}.*:ALL" host="localhost" password={{ wp_db_password }} state=present
+  mysql_user: name="{{ db_user }}" priv="{{ db }}.*:ALL" host="localhost" password={{ db_user_password }} state=present
 
 - name: "Set up docroot"
-  file: path={{ wp_doc_root }}/{{ host }} state=directory owner={{ web_user }} group={{ web_group }}
+  file: path={{ wp_doc_root }}/{{ inventory_hostname }} state=directory owner={{ web_user }} group={{ web_group }}
 
-- name: "Set up virtualhost"
-  template: src=etc/nginx/hhvm.conf dest=/etc/nginx/sites-available/{{ host }}
+- name: "Set up virtualhosts"
+  template: src=etc/nginx/hhvm.conf dest=/etc/nginx/sites-available/{{ inventory_hostname }}
 
-- name: "Enable {{ enviro }} virtualhost"
-  file: src=/etc/nginx/sites-available/{{ host }} dest=/etc/nginx/sites-enabled/{{ host }} state=link
+- name: "Enable {{ enviro }} virtualhosts"
+  file: src=/etc/nginx/sites-available/{{ inventory_hostname }} dest=/etc/nginx/sites-enabled/{{ inventory_hostname }} state=link
   notify: nginx reload
 
 - name: "Download and install WordPress for {{ enviro }}"
-  command: /usr/local/bin/wp core download --path={{ wp_doc_root}}/{{ host }}
+  command: /usr/local/bin/wp core download --path={{ wp_doc_root}}/{{ inventory_hostname }}
   sudo: yes
   sudo_user: "{{ web_user }}"
 
@@ -28,22 +28,17 @@
   sudo: no
 
 - name: "Create wp-config for {{ enviro }}"
-  template: src=wp/wp-config.php dest={{ wp_doc_root }}/{{ host }}/wp-config.php owner={{ web_user }} group={{ web_group }}
+  template: src=wp/wp-config.php dest={{ wp_doc_root }}/{{ inventory_hostname }}/wp-config.php owner={{ web_user }} group={{ web_group }}
 
 - name: "Localconfig for {{ enviro }} WordPress"
-  template: src=wp/local-config.php dest={{ wp_doc_root }}/{{ host }}/local-config.php owner={{ web_user }} group={{ web_group }}
+  template: src=wp/local-config.php dest={{ wp_doc_root }}/{{ inventory_hostname }}/local-config.php owner={{ web_user }} group={{ web_group }}
 
 - name: "Object Cache for {{ enviro }} WordPress"
-  template: src=wp/object-cache.php dest={{ wp_doc_root }}/{{ host }}/wp-content/object-cache.php owner={{ web_user }} group={{ web_group }}
+  template: src=wp/object-cache.php dest={{ wp_doc_root }}/{{ inventory_hostname }}/wp-content/object-cache.php owner={{ web_user }} group={{ web_group }}
 
 - name: "Run the WP install for {{ enviro }}"
-  command: /usr/local/bin/wp core install --url={{ host }} --title="{{ wp_site_name }}" --admin_user={{ wp_admin_user }} --admin_password={{ wp_admin_password }} --admin_email="admin@example.com"
+  command: /usr/local/bin/wp core install --url={{ inventory_hostname }} --title="{{ wp_site_name }}" --admin_user={{ wp_admin }} --admin_password={{ wp_admin_password }} --admin_email="admin@example.com"
   sudo: yes
   sudo_user: "{{ web_user }}"
   args:
-    #   run_once: true
-      chdir: "{{ wp_doc_root }}/{{ host }}"
-
-
-- service: name=varnish state=restarted
-- service: name=nginx state=restarted
+      chdir: "{{ wp_doc_root }}/{{ inventory_hostname }}"

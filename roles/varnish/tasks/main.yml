@@ -1,26 +1,33 @@
 ---
 
 - name: Fill the varnish GPG Key
+  run_once: true
   apt_key: data="{{ lookup('file', '../files/varnish-cache.gpg.key') }}"
 
 - name: Add the varnish cache repo file
+  run_once: true
   apt_repository: repo='deb http://repo.varnish-cache.org/ubuntu/ {{ ansible_lsb.codename }} varnish-{{ varnish_version }}' state=present update_cache=yes
 
 - name: Install Varnish
+  run_once: true
   apt: name=varnish state=present
   notify: varnish reload
 
 - name: Ensure varnish config
+  run_once: true
   template: src=etc/default/varnish dest=/etc/default/varnish owner=root group=root mode=0644
   notify: varnish reload
 
 - name: Ensure varnish default.vcl
+  run_once: true
   template: src=etc/varnish/default.vcl dest=/etc/varnish/default.vcl owner=root group=root mode=0644
   notify: varnish reload
 
 - name: Enable NCSA-style logging
+  run_once: true
   template: src=etc/default/varnishncsa dest=/etc/default/varnishncsa owner=root group=root mode=0644
   notify: varnishncsa reload
 
 - name: Ensure Varnish is running
+  run_once: true
   service: name=varnish state=running

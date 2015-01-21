@@ -1,15 +1,4 @@
 ---
-host: "yourhostname.com"
-
-wp_db_name: wordpress
-wp_db_user: wpuser
-wp_db_password: secret
-
-wp_admin_user: admin
-wp_admin_password: password
-
-wp_site_name: Mercury WP Site
-
 wp_doc_root: /var/www/html
 
 varnish_version: 3.0

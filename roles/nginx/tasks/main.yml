@@ -1,44 +1,56 @@
 ---
 - name: Install Nginx GPG key
+  run_once: true
   apt_key: url=http://nginx.org/keys/nginx_signing.key state=present
 
 - name: Enable Nginx stable repo
+  run_once: true
   apt_repository: repo='deb http://nginx.org/packages/ubuntu {{ ansible_lsb.codename }} nginx' state=present update_cache=yes
 
 - name: Install nginx
+  run_once: true
   apt: name=nginx state=present
   notify:
     - nginx restart
     - update-rc nginx
 
 - name: Ensure /etc/nginx directories exist
+  run_once: true
   file: path={{ item }} state=directory owner=root group=root mode=0755
   with_items:
     - /etc/nginx/sites-available
     - /etc/nginx/sites-enabled
 
 - name: Configure /etc/nginx/nginx.conf
+  run_once: true
   template: src=etc/nginx/nginx.conf dest=/etc/nginx/nginx.conf owner=root group=root mode=0644
   notify: nginx restart
 
 - name: Do nginx upstream.conf
+  run_once: true
   template: src=etc/nginx/conf.d/upstream.conf dest=/etc/nginx/conf.d/upstream.conf owner=root group=root mode=0644
   notify: nginx restart
 
 - name: Remove default.conf
+  run_once: true
   file: path=/etc/nginx/sites-enabled/default state=absent
 
 - name: Remove default conf.d
+  run_once: true
   file: path=/etc/nginx/conf.d/default.conf state=absent
 
 - name: Remove example ssl conf.d
+  run_once: true
   file: path=/etc/nginx/conf.d/example_ssl.conf state=absent
 
 - name: Ensure main docroot exists
-  file: path={{ wp_doc_root }}/{{ host }} state=directory
+  run_once: true
+  file: path={{ wp_doc_root }} state=directory
 
 - name: Set up master docroot
-  file: path={{ wp_doc_root }}/{{ host }} state=directory owner={{ web_user }} group={{ web_group }} mode=0775
+  run_once: true
+  file: path={{ wp_doc_root }} state=directory owner={{ web_user }} group={{ web_group }} mode=0775
 
 - name: Make sure Nginx is running
+  run_once: true
   service: name=nginx state=started enabled=yes

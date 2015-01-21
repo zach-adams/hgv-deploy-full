@@ -5,7 +5,7 @@
 * This file has the following configurations: MySQL settings, Table Prefix,
 * Secret Keys, WordPress Language, and ABSPATH. You can find more information
 * by visiting {@link http://codex.wordpress.org/Editing_wp-config.php Editing
-* wp-config.php} Codex page. You can get the MySQL settings from your web host.
+* wp-config.php} Codex page. You can get the MySQL settings from your web inventory_hostname.
 *
 * This file is used by the wp-config.php creation script during the
 * installation. You don't have to use the web site, you can just copy this file
@@ -17,7 +17,7 @@
 if ( file_exists( dirname( __FILE__ ) . '/local-config.php' ) ) {
     include( dirname( __FILE__ ) . '/local-config.php' );
 } else {
-    // ** MySQL settings - You can get this info from your web host ** //
+    // ** MySQL settings - You can get this info from your web inventory_hostname ** //
     /** The name of the database for WordPress */
     define('DB_NAME', 'database_name_here');
 

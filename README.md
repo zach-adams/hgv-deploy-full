@@ -4,16 +4,16 @@
 
 ## Introduction
 
-This Ansible Playbook is designed to setup a [Mercury-Like](https://github.com/wpengine/hgv/) environment on a Production server without the configuration hassle. This playbook was forked from [WPEngine's Mercury Vagrant](https://github.com/wpengine/hgv/).
+This Ansible Playbook is designed to setup a [Mercury-Like](https://github.com/wpengine/hgv/) environment on a Production server without the configuration hassle. This playbook was forked from [WPEngine's Mercury Vagrant](https://github.com/wpengine/hgv/). It includes the ability to install multiple hostnames and installs of WordPress on one server super easily.
 
 *Note: Remeber not to run weird scripts on your server as root without reviewing them first. Please review this playbook to ensure I'm not installing malicious software.*
 
 This Playbook will setup:
 
 - **Percona DB** (MySQL)
-- **HHVM** (Default)
-- **PHP-FPM** (Backup)
-- **Nginx** (Customized for WordPress)
+- **HHVM** (Default PHP Parser)
+- **PHP-FPM** (Backup PHP Parser)
+- **Nginx**
 - **Varnish** (Running by default)
 - **Memcached and APC**
 - **Clean WordPress Install** (Latest Version)
@@ -28,12 +28,23 @@ This Playbook will setup:
 3. Update Apt with `sudo apt-get update && sudo apt-get upgrade`
 4. Install Git and Ansible with `sudo apt-get install ansible git`
 5. Clone this repository with `git clone https://github.com/zach-adams/hgv-deploy-full/`
-6. Edit `group_vars/all` with your specific details with `vim|emacs|nano group_vars/all`
-7. Edit `hosts` with your specific hostname `vim|emacs|nano hosts`
-8. Run Ansible with `ansible-playbook -i hosts playbook.yml`
-9. Remove the cloned git directory from your server
-10. You may have to restart Varnish and Nginx to get it running: `sudo service varnish restart && sudo service nginx restart`
-11. You're good to go! A new WordPress install running HHVM and Varnish should be waiting for you at your hostname!
+6. Move into `hgv-deploy-full`
+7. Edit the `hosts` file and change `yourhostname.com` to your host name. If you have more than one website that you want to install on this server add each on a new line.
+8. Edit the name of `yourhostname.com` file in the `host_vars` folder to your hostname. If you have more than one website that you want to install on this server copy the current one and name it the hostname of the website.
+9. Run Ansible with `sudo ansible-playbook -i hosts playbook.yml -c local`. If you have any errors please open a new issue in this repository.
+10. Remove the cloned git directory from your server with `rm -rf hgv-deploy-full/`
+11. Restart Varnish and Nginx with: `sudo service varnish restart && sudo service nginx restart`
+12. You're good to go! A new WordPress install running HHVM and Varnish should be waiting for you at your hostname/s!
+
+## Installing a New Website/Hostname
+
+*This only works on sites that were installed using the method above. Always backup your server before running code that could break it.*
+
+1. Backup your server
+2. Follow steps 1-6 above
+3. When you come to your `hosts` file follow the same steps however **do not include any previous installations of WordPress or hostnames, only list the new ones you want.**
+4. Likewise with your `host_var` folder
+5. Follow steps 9-12 and if you run into any issues or errors post them in this repository!
 
 ## Switching HHVM back to PHP-FPM
 

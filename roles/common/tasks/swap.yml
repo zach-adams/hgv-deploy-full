@@ -1,18 +1,22 @@
 ---
 - name: Create swap file
+  run_once: true
   command: dd if=/dev/zero of=/swapfile bs=1024 count=2048k creates=/swapfile
 
 - name: Setup swap area
+  run_once: true
   command: mkswap /swapfile
   when: ansible_swaptotal_mb < 1
 
 - name: Change swap file permissions
+  run_once: true
   file: path=/swapfile
         owner=root
         group=root
         mode=0600
 
 - name: Write swap entry in fstab
+  run_once: true
   mount: name=none
          src=/swapfile
          fstype=swap
@@ -22,5 +26,6 @@
          state=present
 
 - name: Swap on
+  run_once: true
   command: swapon /swapfile
   when: ansible_swaptotal_mb < 1

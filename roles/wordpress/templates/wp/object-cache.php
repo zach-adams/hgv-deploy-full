@@ -352,8 +352,8 @@ class WP_Object_Cache {
 				return $this->mc['default'];
 			}
 
-			function failure_callback($host, $port) {
-				//error_log("Connection failure for $host:$port\n", 3, '/tmp/memcached.txt');
+			function failure_callback($inventory_hostname, $port) {
+				//error_log("Connection failure for $inventory_hostname:$port\n", 3, '/tmp/memcached.txt');
 			}
 
 			function WP_Object_Cache() {

@@ -1,5 +1,6 @@
 ---
 - name: ensure /etc/mysql
+  run_once: true
   file: path=/etc/mysql state=directory owner=root group=root mode=0755
   tags: [ 'percona', 'database' ]
 
@@ -9,14 +10,17 @@
 #     - mysql restart
 
 - name: Install Percona GPG key
+  run_once: true
   apt_key: data="{{ lookup('file', '../templates/percona-gpg-key') }}" state=present
   tags: [ 'percona', 'database' ]
 
 - name: Enable Percona repo
+  run_once: true
   apt_repository: repo='deb http://repo.percona.com/apt {{ ansible_lsb.codename }} main' state=present
   tags: [ 'percona', 'database' ]
 
 - name: Install Percona server
+  run_once: true
   apt: name=percona-server-server-5.6 state=present
   notify:
     - update-rc mysql
@@ -24,6 +28,7 @@
   tags: [ 'percona', 'database' ]
 
 - name: Install Percona client
+  run_once: true
   apt: name=percona-server-client-5.6 state=present
   tags: [ 'percona', 'database' ]
 
