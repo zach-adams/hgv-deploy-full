@@ -31,10 +31,12 @@ This Playbook will setup:
 6. Move into `hgv-deploy-full`
 7. Edit the `hosts` file and change `yourhostname.com` to your host name. If you have more than one website that you want to install on this server add each on a new line.
 8. Edit the name of `yourhostname.com` file in the `host_vars` folder to your hostname. If you have more than one website that you want to install on this server copy the current one and name it the hostname of the website.
-9. Run Ansible with `sudo ansible-playbook -i hosts playbook.yml -c local`. If you have any errors please open a new issue in this repository.
-10. Remove the cloned git directory from your server with `rm -rf hgv-deploy-full/`
-11. Restart Varnish and Nginx with: `sudo service varnish restart && sudo service nginx restart`
-12. You're good to go! A new WordPress install running HHVM and Varnish should be waiting for you at your hostname/s!
+9. Change your sites specific information **including passwords** inside the hostname file inside the `host_vars` directory
+10. Run Ansible with `sudo ansible-playbook -i hosts playbook.yml -c local`. If you have any errors please open a new issue in this repository.
+11. Remove the cloned git directory from your server with `rm -rf hgv-deploy-full/`
+12. Run `/usr/bin/mysql_secure_installation` to install MySQL and secure it. Your root password will be blank by default
+13. Restart Varnish and Nginx with: `sudo service varnish restart && sudo service nginx restart`
+14. You're good to go! A new WordPress install running HHVM and Varnish should be waiting for you at your hostname/s!
 
 ## Installing a New Website/Hostname
 
