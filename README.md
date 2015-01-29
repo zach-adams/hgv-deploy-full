@@ -48,6 +48,16 @@ This Playbook will setup:
 4. Likewise with your `host_var` folder
 5. Follow steps 9-12 and if you run into any issues or errors post them in this repository!
 
+## Turning off Varnish (Use only Nginx)
+
+If you are having issues making changes or having issues with the backend while using Varnish, you can turn it off and just use Nginx while maintaining good performance. Here's how you can do that:
+
+1. Open each of the Nginx configurations of the sites installed on your server with `sudo nano /etc/nginx/sites-available/your-hostname.com`
+2. Change `listen = 8080;` to `listen = 80;` 
+3. Make sure you do this to **all** sites installed on your server
+4. Stop Varnish and Restart Nginx with `sudo service varnish stop && sudo service nginx restart`
+5. You should be good to go!
+
 ## Switching HHVM back to PHP-FPM
 
 Your Nginx configuration should automatically facilitate switching to PHP-FPM if there's an issue with HHVM, however if you want to switch back manually you can do so like this:
