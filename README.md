@@ -56,7 +56,7 @@ If you are having issues making changes or having issues with the backend while 
 2. Change `listen = 8080;` to `listen = 80;` 
 3. Make sure you do this to **all** sites installed on your server
 4. Stop Varnish and Restart Nginx with `sudo service varnish stop && sudo service nginx restart`
-5. You should be good to go!
+5. You should be good to go! If you do not have a caching plugin installed I would highly recommend one.
 
 ## Switching HHVM back to PHP-FPM
 
