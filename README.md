@@ -19,7 +19,7 @@ This Playbook will setup:
 - **Clean WordPress Install** (Latest Version)
 - **WP-CLI**
 
-#### This playbook will only run on Ubuntu 14.04 LTS or later
+#### This playbook will only run on Ubuntu 14.04 LTS
 
 ## Installation
 
