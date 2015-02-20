@@ -6,6 +6,8 @@
   with_items:
       - php5
       - php5-cli
+      - php5-imagick
+      - php5-curl
       - php5-gd
       - php5-fpm
       - php5-memcache
