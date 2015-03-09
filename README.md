@@ -6,7 +6,7 @@
 
 This Ansible Playbook is designed to setup a [Mercury-Like](https://github.com/wpengine/hgv/) environment on a Production server without the configuration hassle. This playbook was forked from [WPEngine's Mercury Vagrant](https://github.com/wpengine/hgv/). It includes the ability to install multiple hostnames and installs of WordPress on one server super easily.
 
-*Note: Remeber not to run weird scripts on your server as root without reviewing them first. Please review this playbook to ensure I'm not installing malicious software.*
+*Note: Remember not to run weird scripts on your server as root without reviewing them first. Please review this playbook to ensure I'm not installing malicious software.*
 
 This Playbook will setup:
 
@@ -85,4 +85,4 @@ Your Nginx configuration should automatically facilitate switching to PHP-FPM if
 
 ## Issues
 
-Please report any issues through Github or email me at zach@zach-adams.com and I'll do my best to get back to you!
+Please report any issues through GitHub or email me at zach@zach-adams.com and I'll do my best to get back to you!
