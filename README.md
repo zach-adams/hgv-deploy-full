@@ -10,7 +10,7 @@ This Ansible Playbook is designed to setup a [Mercury-Like](https://github.com/w
 
 This Playbook will setup:
 
-- **Percona DB** (MySQL)
+- **Percona DB** (MySQL) (Looking for MariaDB? Try [this](https://github.com/xDae/hgv-deploy-full))
 - **HHVM** (Default PHP Parser)
 - **PHP-FPM** (Backup PHP Parser)
 - **Nginx**
