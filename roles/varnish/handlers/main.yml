@@ -3,10 +3,10 @@
 # Specify here any handler you may have available to control your service.
 # http://www.ansibleworks.com/docs/playbooks.html#handlers-running-operations-on-change
 
-- name: restart varnish
+- name: varnish restart
   sudo: yes
   service: name=varnish state=restarted
 
-- name: reload varnish
+- name: varnish reload
   sudo: yes
   service: name=varnish state=reloaded

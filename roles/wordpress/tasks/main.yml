@@ -18,7 +18,7 @@
   notify: nginx reload
 
 - name: "Download and install WordPress for {{ enviro }}"
-  command: /usr/local/bin/wp core download --path={{ wp_doc_root}}/{{ inventory_hostname }}
+  command: /usr/local/bin/wp core download --path={{ wp_doc_root}}/{{ inventory_hostname }} creates={{ wp_doc_root}}/{{ inventory_hostname }}
   sudo: yes
   sudo_user: "{{ web_user }}"
 
@@ -27,14 +27,26 @@
   register: "wp_salt"
   sudo: no
 
+- stat: path={{ wp_doc_root }}/{{ inventory_hostname }}/wp-config.php
+  register: wpconfig
+
 - name: "Create wp-config for {{ enviro }}"
   template: src=wp/wp-config.php dest={{ wp_doc_root }}/{{ inventory_hostname }}/wp-config.php owner={{ web_user }} group={{ web_group }}
+  when: not wpconfig.stat.exists
+
+- stat: path={{ wp_doc_root }}/{{ inventory_hostname }}/local-config.php
+  register: localconfig
 
 - name: "Localconfig for {{ enviro }} WordPress"
   template: src=wp/local-config.php dest={{ wp_doc_root }}/{{ inventory_hostname }}/local-config.php owner={{ web_user }} group={{ web_group }}
+  when: not localconfig.stat.exists
+
+- stat: path={{ wp_doc_root }}/{{ inventory_hostname }}/wp-content/object-cache.php
+  register: objectcache
 
 - name: "Object Cache for {{ enviro }} WordPress"
   template: src=wp/object-cache.php dest={{ wp_doc_root }}/{{ inventory_hostname }}/wp-content/object-cache.php owner={{ web_user }} group={{ web_group }}
+  when: not objectcache.stat.exists
 
 - name: "Run the WP install for {{ enviro }}"
   command: /usr/local/bin/wp core install --url={{ inventory_hostname }} --title="{{ wp_site_name }}" --admin_user={{ wp_admin }} --admin_password={{ wp_admin_password }} --admin_email="admin@example.com"
@@ -42,3 +54,6 @@
   sudo_user: "{{ web_user }}"
   args:
       chdir: "{{ wp_doc_root }}/{{ inventory_hostname }}"
+  notify: 
+    - nginx restart
+    - varnish restart
