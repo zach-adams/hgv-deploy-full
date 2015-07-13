@@ -1,0 +1,38 @@
+---
+
+# Include this task to create and link or remove a Varnish VCL
+#
+#   name: The name of the configuration
+#   template: The template used to produce the conf
+#   state: can be `present` or `absent`
+#
+# Be aware that you will probably have to play with paths like this:
+#
+#   - include: ../../varnish/tasks/vcl.yml
+#     template: ../../caller/templates/myconf.vcl
+
+- name: "VCL {{name}} | Create"
+  sudo: yes
+  template:
+    src: "{{template|default(name+'.vcl')}}"
+    dest: "{{varnish_vcl_dir}}/{{name}}.vcl"
+  when: state is not defined or state == 'present'
+  notify: restart varnish
+  tags:
+    - conf
+    - vcl
+    - varnish
+    - http-cache
+
+- name: "VCL {{name}} | Remove"
+  sudo: yes
+  file:
+    dest: "{{varnish_vcl_dir}}/{{name}}.vcl"
+    state: absent
+  when: state is defined and state == 'absent'
+  notify: restart varnish
+  tags:
+    - conf
+    - vcl
+    - varnish
+    - http-cache

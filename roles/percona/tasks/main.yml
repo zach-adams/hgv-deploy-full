@@ -1,36 +1,72 @@
 ---
-- name: ensure /etc/mysql
-  run_once: true
-  file: path=/etc/mysql state=directory owner=root group=root mode=0755
-  tags: [ 'percona', 'database' ]
 
-# - name: ensure /etc/mysql/my.cnf ...
-#   template: src=etc/mysql/my.cnf dest=/etc/mysql/my.cnf owner=root group=root mode=0644
-#   notify:
-#     - mysql restart
+# Enable Percona Repo
 
-- name: Install Percona GPG key
-  run_once: true
-  apt_key: data="{{ lookup('file', '../templates/percona-gpg-key') }}" state=present
-  tags: [ 'percona', 'database' ]
+- name: Obtaining percona public key
+  apt_key: url=http://www.percona.com/downloads/RPM-GPG-KEY-percona
+          state=present
 
-- name: Enable Percona repo
-  run_once: true
-  apt_repository: repo='deb http://repo.percona.com/apt {{ ansible_lsb.codename }} main' state=present
-  tags: [ 'percona', 'database' ]
+- name: Adding percona repository
+  apt_repository: repo='deb http://repo.percona.com/apt {{ ansible_distribution_release }} main'
+          state=present
 
-- name: Install Percona server
-  run_once: true
-  apt: name=percona-server-server-5.6 state=present
+- name: Adding percona source repository
+  apt_repository: repo='deb-src http://repo.percona.com/apt {{ ansible_distribution_release }} main'
+          state=present
+
+- name: Update apt cache
+  apt: update_cache=yes
+
+# Install Percona Server
+
+- name: Ensure MySQL server is uninstalled
+  action: apt pkg={{ item }} state=absent
+  with_items:
+          - mysql-server-core-5.5
+          - mysql-client 
+          - mysql-client-5.5
+          - mysql-client-core-5.5
+
+- name: Install percona database server
+  action: apt pkg={{ item }} state=latest
+  with_items:
+          - percona-server-server-5.5
+          - percona-server-client-5.5
+          - percona-toolkit
+          - percona-xtrabackup
+          - python-mysqldb
+
+- name: Copy .my.cnf file into the root home folder
+  template: src=root-my-cnf.hgv dest=/root/.my.cnf owner=root mode=0600
+
+- name: Update MySQL root password
+  mysql_user: name=root host={{ item }} password={{ root_password }} login_user=root login_password={{ root_password }} check_implicit_admin=yes
+  with_items:
+          - "{{ ansible_hostname }}"
+          - 127.0.0.1
+          - localhost
+
+- name: Ensure anonymous users are not in the database
+  mysql_user: name='' host={{ item }} state=absent
+  with_items:
+          - "{{ ansible_hostname }}"
+          - localhost
+
+- name: remove test database
+  mysql_db: name=test state=absent
+
+# Enable some neat Percona tools
+
+- name: Create fnv1a_64
+  shell: /usr/bin/mysql -e "CREATE FUNCTION fnv1a_64 RETURNS INTEGER SONAME 'libfnv1a_udf.so'" && touch /var/log/libfnv1a_udf.so.done creates=/var/log/libfnv1a_udf.so.done
+
+- name: Create fnv_64
+  shell: /usr/bin/mysql -e "CREATE FUNCTION fnv_64 RETURNS INTEGER SONAME 'libfnv_udf.so'" && touch /var/log/libfnv_udf.so.done creates=/var/log/libfnv_udf.so.done
+
+- name: Create murmur_hash
+  shell: /usr/bin/mysql -e "CREATE FUNCTION murmur_hash RETURNS INTEGER SONAME 'libmurmur_udf.so'" && touch /var/log/libmurmur_udf.so.done creates=/var/log/libmurmur_udf.so.done
+
+- name: Write custom server configuration
+  template: src=my.cnf.hgv dest=/etc/mysql/my.cnf owner=root mode=0644
   notify:
-    - update-rc mysql
-    - mysql restart
-  tags: [ 'percona', 'database' ]
-
-- name: Install Percona client
-  run_once: true
-  apt: name=percona-server-client-5.6 state=present
-  tags: [ 'percona', 'database' ]
-
-#- name: Ensure Percona is running
-#  service: name=mysql state=started
+          - mysql restart

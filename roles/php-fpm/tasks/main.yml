@@ -1,7 +1,6 @@
 ---
 
 - name: Install PHP packages
-  run_once: true
   apt: name={{ item }} state=present
   with_items:
       - php5
@@ -13,8 +12,5 @@
       - php5-memcache
       - php5-memcached
       - php5-xdebug
+      - php-apcu
       - phpunit
-
-# - name: Do fpm/php.ini
-#   template: src=etc/php5/fpm/php.ini dest=/etc/php5/fpm/php.ini owner=root group=root mode=0644
-#   notify: php5-fpm restart

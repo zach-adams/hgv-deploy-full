@@ -1,13 +1,12 @@
 ---
 
-- name: varnish reload
-  service: name=varnish state=reloaded
+# Specify here any handler you may have available to control your service.
+# http://www.ansibleworks.com/docs/playbooks.html#handlers-running-operations-on-change
 
-- name: varnish restart
+- name: restart varnish
+  sudo: yes
   service: name=varnish state=restarted
 
-- name: varnishncsa reload
-  service: name=varnishncsa state=reloaded
-
-- name: varnishncsa restart
-  service: name=varnishncsa state=restarted
+- name: reload varnish
+  sudo: yes
+  service: name=varnish state=reloaded

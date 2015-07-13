@@ -1,7 +1,6 @@
 ---
 wp_doc_root: /var/www/html
 
-varnish_version: 3.0
 phpmyadmin_version: 4.3.6-english
 phpmemcachedadmin_version: 1.2.2-r262
 wpcli_version: WP-CLI 0.17.1

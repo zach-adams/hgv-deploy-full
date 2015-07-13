@@ -1,0 +1,24 @@
+---
+
+# Integration testing playbook
+# ----------------------------
+
+# A playbook for testing and integration.
+
+# It will provision the `test` hosts in the inventory,
+# which will, by default, specify the provided vagrant VM.
+
+# This playbook should aim to test the most extensive
+# or comprehensive configuration possible for your role.
+
+
+- name: 'Role integration tests'
+
+  hosts: test
+
+  vars:
+    # custom_configuration: value
+
+  roles:
+    - '.'    # The current directory itself is the role
+

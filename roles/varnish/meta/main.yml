@@ -1,0 +1,18 @@
+---
+
+galaxy_info:
+  author: zenoamaro
+  description: A role to install and configure Varnish
+  version: 0.1.1
+  license: MIT
+  min_ansible_version: 1.4
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - precise
+
+  categories:
+    - web
+
+dependencies: []

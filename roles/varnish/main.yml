@@ -1,0 +1,19 @@
+---
+
+# Quick-provisioning playbook
+# ---------------------------
+
+# A Simple, straight playbook for quick remote installations.
+# You will be asked which hosts to provision before-hand.
+
+
+- name: 'Varnish'
+
+  vars_prompt:
+    selected_hosts: Specify the hosts to provision
+
+  hosts: "{{selected_hosts}}"
+
+  roles:
+    - '.'    # The current directory itself is the role
+

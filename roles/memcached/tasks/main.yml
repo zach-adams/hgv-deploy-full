@@ -1,10 +1,8 @@
 ---
 
 - name: Install memcached server
-  run_once: true
   apt: name=memcached state=present
 
 - name: Do memcached config
-  run_once: true
   template: src=etc/memcached.conf dest=/etc/memcached.conf owner=root group=root mode=0644
   notify: memcached restart

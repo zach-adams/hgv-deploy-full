@@ -1,0 +1,20 @@
+---
+
+# Boxed installation playbook
+# ---------------------------
+
+# A Simple, straight playbook for producing
+# a boxed installation in a vagrant VM.
+
+
+- name: 'Varnish boxed installation'
+
+  hosts: vagrant
+
+  # vars:
+    # You may wish to point this to your service
+    # varnish_backend: 192.168.0.1:80
+
+  roles:
+    - '.'    # The current directory itself is the role
+

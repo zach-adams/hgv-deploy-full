@@ -1,0 +1,10 @@
+---
+
+- name: Prerequisites for provisioning
+  sudo: yes
+  apt:
+    name: python-pycurl  # Ansible PPA module uses this
+  tags:
+    - deps
+    - varnish
+    - http-cache

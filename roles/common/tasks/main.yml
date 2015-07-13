@@ -1,6 +1,5 @@
 ---
 - name: Install necessary packages for proper system state
-  run_once: true
   apt: name={{ item }} state=latest
   sudo: yes
   with_items:
@@ -19,23 +18,18 @@
     - siege
 
 - name: Get Composer
-  run_once: true
   get_url: url=https://getcomposer.org/composer.phar dest=/usr/local/bin/composer mode=0755 validate_certs=no
 
 - name: Install PsySH
-  run_once: true
   get_url: url=http://psysh.org/psysh dest=/usr/local/bin/psysh mode=0755
 
 - name: Install Boris
-  run_once: true
   get_url: url=https://github.com/d11wtq/boris/releases/download/v1.0.8/boris.phar dest=/usr/local/bin/boris mode=0755 validate_certs=no
 
 - name: Fix the stdin bug, step 1
-  run_once: true
   lineinfile: dest=/root/.profile line="mesg n" state=absent
 
 - name: Fix the stdin bug, step 2
-  run_once: true
   lineinfile: dest=/root/.profile line="tty -s && mesg n"
 
 - include: swap.yml

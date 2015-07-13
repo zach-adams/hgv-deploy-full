@@ -1,16 +1,12 @@
 ---
 - name: Create install location for WP-CLI
-  run_once: true
   file: dest=/usr/share/wp-cli mode=755 owner=root group=root state=directory
 
 - name: Install WP-CLI
-  run_once: true
   command: curl https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /usr/share/wp-cli/wp
 
 - name: Set execute bits on WP-CLI
-  run_once: true
   command: chmod 755 /usr/share/wp-cli/wp
 
 - name: Symlink WP-CLI
-  run_once: true
   file: dest=/usr/local/bin/wp src=/usr/share/wp-cli/wp state=link

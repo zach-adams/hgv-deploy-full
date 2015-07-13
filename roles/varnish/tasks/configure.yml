@@ -1,0 +1,35 @@
+---
+
+# Targeting specific OSes or distributions:
+#
+#   - `ansible_system`               → Linux, BSD, ...
+#   - `ansible_os_family`            → Debian, RedHat, ...
+#   - `ansible_distribution`         → Debian, Ubuntu, RedHat, ...
+#   - `ansible_distribution_release` → precise, wheezy, ...
+#   - `ansible_pkg_mgr`              → apt, yum, ...
+
+- name: Create configuration directories
+  sudo: yes
+  file:
+    dest: "{{item}}"
+    state: directory
+  with_items:
+    - "{{varnish_vcl_dir}}"
+  tags:
+    - conf
+    - varnish
+    - http-cache
+
+- name: Configure Varnish
+  sudo: yes
+  template:
+    src: varnish.conf
+    dest: "{{varnish_conf_file}}"
+  notify: restart varnish
+  tags:
+    - conf
+    - varnish
+    - http-cache
+
+- include: vcl.yml
+  name: default
