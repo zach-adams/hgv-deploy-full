@@ -65,8 +65,5 @@
   args:
       chdir: "{{ wp_doc_root }}/{{ inventory_hostname }}"
 
-- name: "Restart Varnish and Nginx"
-  run_once: true
-  notify:
-    - varnish restart 
-    - nginx restart
+- service: name=varnish state=restarted
+- service: name=nginx state=restarted
