@@ -25,11 +25,17 @@
   sudo: yes
   sudo_user: "{{ web_user }}"
   when: not isinstalled.stat.exists
-
+    
 - name: Fetch random salts for WordPress config
-  local_action: command curl https://api.wordpress.org/secret-key/1.1/salt/
-  register: "wp_salt"
-  sudo: no
+  get_url:
+    dest: "{{ wp_doc_root }}/{{ enviro }}/wp-salts.php"
+    url: https://api.wordpress.org/secret-key/1.1/salt/
+
+- name: Make salts file a PHP file
+  lineinfile:
+    dest: path={{ wp_doc_root }}/{{ inventory_hostname }}/wp-salts.php
+    insertbefore: BOF
+    line: <?php
 
 - stat: path={{ wp_doc_root }}/{{ inventory_hostname }}/wp-config.php
   register: wpconfig
