@@ -58,6 +58,9 @@
   sudo_user: "{{ web_user }}"
   args:
       chdir: "{{ wp_doc_root }}/{{ inventory_hostname }}"
-  notify: 
+
+- name: "Restart Varnish and Nginx"
+  run_once: true
+  notify:
+    - varnish restart 
     - nginx restart
-    - varnish restart
