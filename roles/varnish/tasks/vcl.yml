@@ -17,7 +17,7 @@
     src: "{{template|default(name+'.vcl')}}"
     dest: "{{varnish_vcl_dir}}/{{name}}.vcl"
   when: state is not defined or state == 'present'
-  notify: restart varnish
+  notify: varnish restart
   tags:
     - conf
     - vcl
@@ -30,7 +30,7 @@
     dest: "{{varnish_vcl_dir}}/{{name}}.vcl"
     state: absent
   when: state is defined and state == 'absent'
-  notify: restart varnish
+  notify: varnish restart
   tags:
     - conf
     - vcl

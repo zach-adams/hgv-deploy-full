@@ -25,7 +25,7 @@
   template:
     src: varnish.conf
     dest: "{{varnish_conf_file}}"
-  notify: restart varnish
+  notify: varnish restart
   tags:
     - conf
     - varnish

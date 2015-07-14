@@ -2,6 +2,7 @@
 
 - name: Install PHP packages
   apt: name={{ item }} state=present
+  sudo: yes
   with_items:
       - php5
       - php5-cli
@@ -12,5 +13,5 @@
       - php5-memcache
       - php5-memcached
       - php5-xdebug
-      - php-apcu
+      - php-apc
       - phpunit

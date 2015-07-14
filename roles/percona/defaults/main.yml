@@ -10,7 +10,7 @@ key_buffer: 16M
 thread_stack: 192K
 thread_cache_size: 8
 # Uncomment following vars if you want to log queries
-# sqldebug: true
+sqldebug: false
 # log_slow_queries: log_slow_queries    = /var/log/mysql/mysql-slow.log
 # long_query_time: long_query_time      = 2
 # log_queries_not_using_indexes: log-queries-not-using-indexes

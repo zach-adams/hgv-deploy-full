@@ -17,10 +17,14 @@
   file: src=/etc/nginx/sites-available/{{ inventory_hostname }} dest=/etc/nginx/sites-enabled/{{ inventory_hostname }} state=link
   notify: nginx reload
 
+- stat: path={{ wp_doc_root }}/{{ inventory_hostname }}/index.php
+  register: isinstalled
+
 - name: "Download and install WordPress for {{ enviro }}"
-  command: /usr/local/bin/wp core download --path={{ wp_doc_root}}/{{ inventory_hostname }} creates={{ wp_doc_root}}/{{ inventory_hostname }}
+  command: /usr/local/bin/wp core download --path={{ wp_doc_root}}/{{ inventory_hostname }}
   sudo: yes
   sudo_user: "{{ web_user }}"
+  when: not isinstalled.stat.exists
 
 - name: Fetch random salts for WordPress config
   local_action: command curl https://api.wordpress.org/secret-key/1.1/salt/

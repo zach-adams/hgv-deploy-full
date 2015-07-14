@@ -3,23 +3,28 @@
 # Enable Percona Repo
 
 - name: Obtaining percona public key
+  sudo: yes
   apt_key: url=http://www.percona.com/downloads/RPM-GPG-KEY-percona
           state=present
 
 - name: Adding percona repository
+  sudo: yes
   apt_repository: repo='deb http://repo.percona.com/apt {{ ansible_distribution_release }} main'
           state=present
 
 - name: Adding percona source repository
+  sudo: yes
   apt_repository: repo='deb-src http://repo.percona.com/apt {{ ansible_distribution_release }} main'
           state=present
 
 - name: Update apt cache
   apt: update_cache=yes
+  run_once: true
 
 # Install Percona Server
 
 - name: Ensure MySQL server is uninstalled
+  sudo: yes
   action: apt pkg={{ item }} state=absent
   with_items:
           - mysql-server-core-5.5
@@ -28,6 +33,7 @@
           - mysql-client-core-5.5
 
 - name: Install percona database server
+  sudo: yes
   action: apt pkg={{ item }} state=latest
   with_items:
           - percona-server-server-5.5
