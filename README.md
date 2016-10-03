@@ -1,3 +1,9 @@
+# WARNING: DEPRECATED
+
+Unfortunately I don't have the time to upkeep this project or provide updates for issues. I'd recommend using Carl Alexander's DebOps for WordPress project which does the same thing as this project. You can find it here:
+
+https://github.com/carlalexander/debops-wordpress
+
 # Mercury Vagrant (HGV) Deployment Playbook
 
 [Click here for the basic version](https://github.com/zach-adams/hgv-deploy-basic)
